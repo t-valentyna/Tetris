@@ -31,25 +31,25 @@ const TETROMINOES = {
         [0,0,0]
     ],
     "N": [
-        [0,1],
-        [1,1],
-        [1,0]
+        [1,1,0],
+        [0,1,1],
+        [0,0,0]
     ],
     "FN": [
-        [1,0],
-        [1,1],
-        [0,1]
+        [0,1,1],
+        [1,1,0],
+        [0,0,0]
     ],
     "T": [
-        [1,0],
-        [1,1],
-        [1,0]
+        [1,1,1],
+        [0,1,0],
+        [0,0,0]
     ],
     "I": [
-        [1],
-        [1],
-        [1],
-        [1]
+        [1,1,1,1],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0]
     ]
 };
 
@@ -107,7 +107,7 @@ function drawTetromino() {
 
     for (let row = 0; row < tetrominoMatrixSize; row++) {
         for (let column = 0; column < tetrominoMatrixSize; column++) {
-            if(tetromino.matrix[row][column] == 0) continue;
+            if(!tetromino.matrix[row][column]) continue;
             const cellIndex = convertPositionToIndex(
                 tetromino.row + row,
                 tetromino.column + column
