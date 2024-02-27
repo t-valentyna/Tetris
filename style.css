@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Anta&display=swap');
+
 * {
     margin: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -8,6 +11,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 5vw;
 }
 
 .grid {
@@ -19,10 +23,19 @@ body {
 }
 
 .grid > div {
-    height: min(4vh, 7vw);
-    width: min(4vh, 7vw);
+    height: min(4vh, 5vw);
+    width: min(4vh, 5vw);
     background-color: rgb(224, 247, 225);
     border-radius: 0.3vh;
+}
+
+.score {
+    background-color: rgb(224, 247, 225);
+    border: rgb(50, 163, 24) 0.5vh solid;
+    padding: 1vh;
+    text-align: center;
+    font-family: "Anta", sans-serif;
+    font-size: min(1em, 3.5vw);
 }
 
 .grid .O {
