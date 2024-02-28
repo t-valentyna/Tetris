@@ -1,7 +1,4 @@
-// Поставити const rowTetro = -2; прописати код, щоб працювало коректно
-// Звурстати поле для розрахунку балів
-// Прописати логіку і код розрахунку балів гри (1 ряд = 10; 2 ряди = 30; 3 ряди = 50; 4 = 100)
-// Реалізувати самостійний рух донизу
+
 const PLAYFIELD_COLUMNS = 10;
 const PLAYFIELD_ROWS = 20;
 const TETROMINO_NAMES = ["O", "J", "L", "N", "FN", "T", "I"];
@@ -89,7 +86,30 @@ function placeTetromino() {
     }
   }
 
+  const filledRows = findFilledRows();
+  removeFilledRows(filledRows);
+  addPointsToScore(filledRows.length);
   generateTetromino();
+}
+
+function removeFilledRows(filledRows) {
+  for(let i = 0; i < filledRows.length; i++) {
+    const row = filledRows[i];
+    dropRowsAbove(row);
+  }
+}
+
+function dropRowsAbove(rowDelete) {
+  playField.splice(rowDelete, 1);
+  playField.unshift(new Array(PLAYFIELD_COLUMNS).fill(0));
+}
+
+function findFilledRows() {
+  const fillRows = [];
+  for (let row = 0; row < PLAYFIELD_ROWS; row++) {
+    if (!playField[row].some((cell) => cell == 0)) fillRows.push(row);
+  }
+  return fillRows;
 }
 
 generatePlayField();
@@ -225,7 +245,9 @@ function hasCollisions(row, column) {
   return playField?.[tetromino.row + row]?.[tetromino.column + column] || false;
 }
 
+const scoreElement = document.querySelector(".score h2");
 let score = 0;
+
 function addPointsToScore(numberOfRows) {
   switch (numberOfRows) {
     case 1:
@@ -241,10 +263,13 @@ function addPointsToScore(numberOfRows) {
       score += 100;
       break;
   }
-  document.querySelector(".score h2").innerHTML = score;
+  scoreElement.innerHTML = score;
 }
 
-setInterval(() => {
+function autoMoveDown() {
   moveTetrominoDown();
   draw();
-}, 1000);
+  setTimeout(() => requestAnimationFrame(autoMoveDown), 1000);
+}
+
+requestAnimationFrame(autoMoveDown);
