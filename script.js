@@ -1,7 +1,25 @@
+// Зробити розмітку висновків гри (час гри, набрана кількість балів і тд)
+// Створити окрему кнопку для перезапуску гри під час гри
+// Додати клавіатуру на екрані браузера
+// Показувати наступну фігуру, яка буде випадати
+// Додати рівні гри, при яких буде пришвидшуватись падіння фігур
+// Зберегти та виводити найкращий власний результат
+
 
 const PLAYFIELD_COLUMNS = 10;
 const PLAYFIELD_ROWS = 20;
 const TETROMINO_NAMES = ["O", "J", "L", "N", "FN", "T", "I"];
+const btnRestart = document.querySelector(".btn-restart");
+const scoreElement = document.querySelector(".score h2");
+const overlay = document.querySelector(".overlay");
+const grid = document.querySelector(".grid");
+let playField;
+let tetromino;
+let score = 0;
+let timeId;
+let isGameOver = false;
+let isPaused = false;
+let cells;
 
 const TETROMINOES = {
   O: [
@@ -41,17 +59,32 @@ const TETROMINOES = {
   ],
 };
 
+init();
+
+function init() {
+  isGameOver = false;
+  score = 0;
+  scoreElement.innerHTML = score;
+  generatePlayField();
+  generateTetromino();
+  cells = document.querySelectorAll(".grid div");
+  requestAnimationFrame(autoMoveDown);
+}
+
+btnRestart.addEventListener("click", function(){
+  grid.innerHTML = '';
+  overlay.style.display = "none";
+  init();
+})
+
 function convertPositionToIndex(row, column) {
   return row * PLAYFIELD_COLUMNS + column;
 }
 
-let playField;
-let tetromino;
-
 function generatePlayField() {
   for (let i = 0; i < PLAYFIELD_ROWS * PLAYFIELD_COLUMNS; i++) {
     const div = document.createElement("div");
-    document.querySelector(".grid").append(div);
+    grid.append(div);
   }
 
   playField = new Array(PLAYFIELD_ROWS)
@@ -80,6 +113,10 @@ function placeTetromino() {
   const matrixSize = tetromino.matrix.length;
   for (let row = 0; row < matrixSize; row++) {
     for (let column = 0; column < matrixSize; column++) {
+      if (isOutsideOfTopboard(row)) {
+        isGameOver = true;
+        return;
+      }
       if (tetromino.matrix[row][column] == 0) continue;
       playField[tetromino.row + row][tetromino.column + column] =
         tetromino.name;
@@ -111,10 +148,6 @@ function findFilledRows() {
   }
   return fillRows;
 }
-
-generatePlayField();
-generateTetromino();
-const cells = document.querySelectorAll(".grid div");
 
 function drawPlayField() {
   for (let row = 0; row < PLAYFIELD_ROWS; row++) {
@@ -157,21 +190,36 @@ draw();
 
 document.addEventListener("keydown", onKeyDown);
 function onKeyDown(e) {
-  switch (e.key) {
-    case "ArrowUp":
-      rotateTetromino();
-      break;
-    case "ArrowDown":
-      moveTetrominoDown();
-      break;
-    case "ArrowLeft":
-      moveTetrominoLeft();
-      break;
-    case "ArrowRight":
-      moveTetrominoRight();
-      break;
+  if (e.key == "Escape") {
+    togglePauseGame();
+  }
+
+  if (!isPaused) {
+    switch (e.key) {
+      case "ArrowUp":
+        rotateTetromino();
+        break;
+      case "ArrowDown":
+        moveTetrominoDown();
+        break;
+      case "ArrowLeft":
+        moveTetrominoLeft();
+        break;
+      case "ArrowRight":
+        moveTetrominoRight();
+        break;
+      case " ":
+        dropTetrominoDown();
+        break;
+    }
   }
   draw();
+}
+
+function dropTetrominoDown() {
+  while (tetromino.row > 0) {
+    moveTetrominoDown();
+  }
 }
 
 function rotateTetromino() {
@@ -233,6 +281,10 @@ function isValid() {
   return true;
 }
 
+function isOutsideOfTopboard(row) {
+  return tetromino.row + row < 0;
+}
+
 function isOutsideOfGameboard(row, column) {
   return (
     tetromino.column + column < 0 ||
@@ -244,9 +296,6 @@ function isOutsideOfGameboard(row, column) {
 function hasCollisions(row, column) {
   return playField?.[tetromino.row + row]?.[tetromino.column + column] || false;
 }
-
-const scoreElement = document.querySelector(".score h2");
-let score = 0;
 
 function addPointsToScore(numberOfRows) {
   switch (numberOfRows) {
@@ -269,7 +318,26 @@ function addPointsToScore(numberOfRows) {
 function autoMoveDown() {
   moveTetrominoDown();
   draw();
-  setTimeout(() => requestAnimationFrame(autoMoveDown), 1000);
+  timeId = setTimeout(() => requestAnimationFrame(autoMoveDown), 1000);
+  if (isGameOver) {
+    gameOver();
+  }
 }
 
-requestAnimationFrame(autoMoveDown);
+function stopGame() {
+  clearTimeout(timeId);
+}
+
+function togglePauseGame() {
+  if(isPaused === false) {
+    stopGame();
+  } else {
+    autoMoveDown();
+  }
+  isPaused = !isPaused;
+}
+
+function gameOver() {
+  stopGame();
+  overlay.style.display = "flex";
+}

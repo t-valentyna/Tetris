@@ -3,6 +3,7 @@
 * {
     margin: 0;
     box-sizing: border-box;
+    font-family: "Anta", sans-serif;
 }
 
 body {
@@ -34,8 +35,32 @@ body {
     border: rgb(50, 163, 24) 0.5vh solid;
     padding: 1vh;
     text-align: center;
-    font-family: "Anta", sans-serif;
     font-size: min(1em, 3.5vw);
+    user-select: none;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.427);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-restart {
+    width: 300px;
+    height: 200px;
+    background: linear-gradient(33deg, blue, green);
+    border-radius: 20px;
+    border: rgb(224, 247, 225) 0.5vh solid;
+    font-size: 55px;
+    box-shadow: 0px 2px 10px 10px black;
+    cursor: pointer;
+    text-shadow: 2px 2px 6px rgb(224, 247, 225);
 }
 
 .grid .O {
