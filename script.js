@@ -1,18 +1,21 @@
-// Зробити розмітку висновків гри (час гри, набрана кількість балів і тд)
-// Створити окрему кнопку для перезапуску гри під час гри
-// Додати клавіатуру на екрані браузера
-// Показувати наступну фігуру, яка буде випадати
-// Додати рівні гри, при яких буде пришвидшуватись падіння фігур
-// Зберегти та виводити найкращий власний результат
-
-
 const PLAYFIELD_COLUMNS = 10;
 const PLAYFIELD_ROWS = 20;
 const TETROMINO_NAMES = ["O", "J", "L", "N", "FN", "T", "I"];
 const btnRestart = document.querySelector(".btn-restart");
 const scoreElement = document.querySelector(".score h2");
-const overlay = document.querySelector(".overlay");
+const overlayPaused = document.querySelector(".paused");
+const overlayGameOver = document.querySelector(".game-over");
 const grid = document.querySelector(".grid");
+const stats = document.getElementById("stats");
+const timeElement = document.querySelector(".time h2");
+const levelElement = document.querySelector(".level h2");
+const btnReset = document.getElementById("reset");
+const btnPause = document.getElementById("pause");
+const btnArrowUp = document.getElementById("arrow-up");
+const btnArrowLeft = document.getElementById("arrow-left");
+const btnArrowDown = document.getElementById("arrow-down");
+const btnArrowRight = document.getElementById("arrow-right");
+const next = document.querySelector(".next-tetromino");
 let playField;
 let tetromino;
 let score = 0;
@@ -20,6 +23,13 @@ let timeId;
 let isGameOver = false;
 let isPaused = false;
 let cells;
+let time = 0;
+let timerId;
+let numOfPlacedTetromino = 0;
+let level = 1;
+let speed = 1;
+let nextNameIndex;
+let nextTetraminoCells;
 
 const TETROMINOES = {
   O: [
@@ -64,18 +74,52 @@ init();
 function init() {
   isGameOver = false;
   score = 0;
+  time = 0;
+  level = 1;
+  speed = 1;
+  timeElement.innerHTML = getTimeFormated(time);
   scoreElement.innerHTML = score;
+  levelElement.innerHTML = level;
   generatePlayField();
+  nextNameIndex = getRandomIndex();
+  createNextTetraminoField();
+  nextTetraminoCells = document.querySelectorAll(".next-tetromino div");
   generateTetromino();
   cells = document.querySelectorAll(".grid div");
   requestAnimationFrame(autoMoveDown);
+  requestAnimationFrame(timerOn);
 }
 
-btnRestart.addEventListener("click", function(){
-  grid.innerHTML = '';
-  overlay.style.display = "none";
+function restart() {
+  grid.innerHTML = "";
+  next.innerHTML = "";
+  overlayGameOver.style.display = "none";
   init();
-})
+}
+
+btnRestart.addEventListener("click", restart);
+btnReset.addEventListener("click", function () {
+  clearTimeout(timeId);
+  clearTimeout(timerId);
+  restart();
+});
+btnPause.addEventListener("click", togglePauseGame);
+btnArrowDown.addEventListener("click", function () {
+  moveTetrominoDown();
+  draw();
+});
+btnArrowUp.addEventListener("click", function () {
+  rotateTetromino();
+  draw();
+});
+btnArrowLeft.addEventListener("click", function () {
+  moveTetrominoLeft();
+  draw();
+});
+btnArrowRight.addEventListener("click", function () {
+  moveTetrominoRight();
+  draw();
+});
 
 function convertPositionToIndex(row, column) {
   return row * PLAYFIELD_COLUMNS + column;
@@ -93,8 +137,14 @@ function generatePlayField() {
   // console.table(playField);
 }
 
+function getRandomIndex() {
+  return Math.floor(Math.random() * TETROMINO_NAMES.length);
+}
+
 function generateTetromino() {
-  const nameIndex = Math.floor(Math.random() * TETROMINO_NAMES.length);
+  const nameIndex = nextNameIndex;
+  nextNameIndex = getRandomIndex();
+  showNextTetramino();
 
   const name = TETROMINO_NAMES[nameIndex];
   const matrix = TETROMINOES[name];
@@ -108,6 +158,30 @@ function generateTetromino() {
     column,
   };
 }
+
+function createNextTetraminoField() {
+  for (let i = 0; i < 4 * 4; i++) {
+    const div = document.createElement("div");
+    next.append(div);
+  }
+}
+
+function showNextTetramino() {
+  nextTetraminoCells.forEach((cell) => cell.removeAttribute("class"));
+  const name = TETROMINO_NAMES[nextNameIndex];
+  const matrix = TETROMINOES[name];
+  const tetrominoMatrixSize = matrix.length;
+
+  for (let row = 0; row < tetrominoMatrixSize; row++) {
+    for (let column = 0; column < tetrominoMatrixSize; column++) {
+      if (!matrix[row][column]) continue;
+      const cellIndex = row * 4 + column;
+      // console.log(cellIndex);
+      if (cellIndex >= 0) nextTetraminoCells[cellIndex].classList.add(name);
+    }
+  }
+}
+
 
 function placeTetromino() {
   const matrixSize = tetromino.matrix.length;
@@ -127,10 +201,21 @@ function placeTetromino() {
   removeFilledRows(filledRows);
   addPointsToScore(filledRows.length);
   generateTetromino();
+  numOfPlacedTetromino++;
+  if (numOfPlacedTetromino > 10) {
+    numOfPlacedTetromino = 0;
+    levelUp();
+  }
+}
+
+function levelUp() {
+  level++;
+  levelElement.innerHTML = level;
+  speed -= 0.1;
 }
 
 function removeFilledRows(filledRows) {
-  for(let i = 0; i < filledRows.length; i++) {
+  for (let i = 0; i < filledRows.length; i++) {
     const row = filledRows[i];
     dropRowsAbove(row);
   }
@@ -318,10 +403,23 @@ function addPointsToScore(numberOfRows) {
 function autoMoveDown() {
   moveTetrominoDown();
   draw();
-  timeId = setTimeout(() => requestAnimationFrame(autoMoveDown), 1000);
+  timeId = setTimeout(() => requestAnimationFrame(autoMoveDown), 1000 * speed);
   if (isGameOver) {
     gameOver();
   }
+}
+
+function timerOn() {
+  time++;
+  timeElement.innerHTML = getTimeFormated(time);
+  timerId = setTimeout(() => requestAnimationFrame(timerOn), 1000);
+  if (isGameOver) {
+    gameOver();
+  }
+}
+
+function timerOff() {
+  clearTimeout(timerId);
 }
 
 function stopGame() {
@@ -329,15 +427,35 @@ function stopGame() {
 }
 
 function togglePauseGame() {
-  if(isPaused === false) {
+  if (isPaused === false) {
     stopGame();
+    timerOff();
+    overlayPaused.style.display = "flex";
   } else {
     autoMoveDown();
+    timerOn();
+    overlayPaused.style.display = "none";
   }
   isPaused = !isPaused;
 }
 
+function getTimeFormated(num) {
+  const numToStr = (num) => num.toString().padStart(2, "0");
+  return `${numToStr(Math.floor(num / 60))}:${numToStr(num % 60)}`;
+}
+
+function getBestResult() {
+  if (!localStorage.bestResult || Number(localStorage.bestResult) < score) {
+    localStorage.bestResult = score;
+  }
+  return localStorage.bestResult;
+}
+
 function gameOver() {
   stopGame();
-  overlay.style.display = "flex";
+  timerOff();
+  stats.innerHTML = `Your score: ${score} <br/> Time spent: ${getTimeFormated(
+    time
+  )} <br/> Best personal result: ${getBestResult()}`;
+  overlayGameOver.style.display = "flex";
 }

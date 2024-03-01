@@ -1,91 +1,148 @@
-@import url('https://fonts.googleapis.com/css2?family=Anta&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Anta&display=swap");
 
 * {
-    margin: 0;
-    box-sizing: border-box;
-    font-family: "Anta", sans-serif;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Anta", sans-serif;
 }
 
 body {
-    background: linear-gradient(33deg, blue, green);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5vw;
+  background: linear-gradient(33deg, blue, green);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5vw;
 }
 
 .grid {
-    background: rgb(50, 163, 24);
-    padding: 0.5vh;
-    display: grid;
-    grid-template-columns: repeat(10, auto);
-    gap: 0.5vh;
+  background: rgb(50, 163, 24);
+  padding: 0.5vh;
+  display: grid;
+  grid-template-columns: repeat(10, auto);
+  gap: 0.5vh;
 }
 
 .grid > div {
-    height: min(4vh, 5vw);
-    width: min(4vh, 5vw);
-    background-color: rgb(224, 247, 225);
-    border-radius: 0.3vh;
+  height: min(4vh, 5vw);
+  width: min(4vh, 5vw);
+  background-color: rgb(224, 247, 225);
+  border-radius: 0.3vh;
 }
 
-.score {
-    background-color: rgb(224, 247, 225);
-    border: rgb(50, 163, 24) 0.5vh solid;
-    padding: 1vh;
-    text-align: center;
-    font-size: min(1em, 3.5vw);
-    user-select: none;
+.next-tetromino {
+  background: rgb(50, 163, 24);
+  padding: 0.5vh;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 0.5vh;
+}
+
+.next-tetromino > div {
+  height: min(3vh, 4vw);
+  width: min(3vh, 4vw);
+  background-color: rgb(224, 247, 225);
+  border-radius: 0.3vh;
+}
+
+.side-panel {
+  background-color: rgb(224, 247, 225);
+  border: rgb(50, 163, 24) 0.5vh solid;
+  padding: 1vh;
+  text-align: center;
+  font-size: min(1em, 3.5vw);
+  user-select: none;
+}
+
+.buttons {
+  display: grid;
+  grid-template-areas:
+    "reset . pause"
+    ". arrow-up ."
+    "arrow-left arrow-down arrow-right";
+  font-size: larger;
+  font-weight: bold;
+}
+
+#reset {
+  grid-area: reset;
+}
+
+#pause {
+  grid-area: pause;
+}
+
+#arrow-up {
+  grid-area: arrow-up;
+}
+
+#arrow-left {
+  grid-area: arrow-left;
+}
+
+#arrow-down {
+  grid-area: arrow-down;
+}
+
+#arrow-right {
+  grid-area: arrow-right;
 }
 
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.427);
-    display: none;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.427);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  color: rgb(224, 247, 225);
+  text-shadow: 0px 0px 5px black;
+}
+
+.game-over {
+  gap: 5vh;
+  flex-direction: column;
+  text-align: center;
 }
 
 .btn-restart {
-    width: 300px;
-    height: 200px;
-    background: linear-gradient(33deg, blue, green);
-    border-radius: 20px;
-    border: rgb(224, 247, 225) 0.5vh solid;
-    font-size: 55px;
-    box-shadow: 0px 2px 10px 10px black;
-    cursor: pointer;
-    text-shadow: 2px 2px 6px rgb(224, 247, 225);
+  width: 300px;
+  height: 200px;
+  background: linear-gradient(33deg, blue, green);
+  border-radius: 20px;
+  border: rgb(224, 247, 225) 0.5vh solid;
+  font-size: 55px;
+  box-shadow: 0px 2px 10px 10px black;
+  cursor: pointer;
+  text-shadow: 2px 2px 6px rgb(224, 247, 225);
 }
 
-.grid .O {
-    background-color: green;
+.grid .O, .next-tetromino .O {
+  background-color: green;
 }
 
-.grid .J {
-    background-color: rgb(238, 226, 58);
+.grid .J, .next-tetromino .J {
+  background-color: rgb(238, 226, 58);
 }
 
-.grid .L{
-    background-color: rgb(211, 85, 17);
+.grid .L, .next-tetromino .L {
+  background-color: rgb(211, 85, 17);
 }
 
-.grid .N{
-    background-color: rgb(17, 17, 211);
+.grid .N, .next-tetromino .N {
+  background-color: rgb(17, 17, 211);
 }
 
-.grid .FN{
-    background-color: rgb(156, 17, 211);
+.grid .FN, .next-tetromino .FN {
+  background-color: rgb(156, 17, 211);
 }
 
-.grid .T{
-    background-color: rgb(211, 17, 169);
+.grid .T, .next-tetromino .T {
+  background-color: rgb(211, 17, 169);
 }
-.grid .I{
-    background-color: rgb(19, 214, 235);
+.grid .I, .next-tetromino .I {
+  background-color: rgb(19, 214, 235);
 }

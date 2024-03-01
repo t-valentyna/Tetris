@@ -10,12 +10,37 @@
     <div class="grid">
 
     </div>
-    <div class="score">
-        <h1>Score</h1>
-        <h2>0</h2>
+    <div class="side-panel">
+        <div class="score">
+            <h1>Score</h1>
+            <h2>0</h2>
+        </div>
+        <div class="time">
+            <h1>Time</h1>
+            <h2>00:00</h2>
+        </div>
+        <div class="level">
+            <h1>Level</h1>
+            <h2>1</h2>
+        </div>
+        <div class="buttons">
+            <div id="reset">↻</div>
+            <div id="pause">||</div>
+            <div id="arrow-up">▲</div>
+            <div id="arrow-left">◀</div>
+            <div id="arrow-down">▼</div>
+            <div id="arrow-right">▶</div>
+        </div>
+        <div class="next-tetromino">
+        </div>
     </div>
-    <div class="overlay">
+    <div class="overlay game-over">
+        <h1>Game Over</h1>
+        <h2 id="stats"></h2>
         <button class="btn-restart">Restart</button>
+    </div>
+    <div class="overlay paused">
+        <h1>Paused</h1>
     </div>
     <script src="script.js"></script>
 </body>
